@@ -1,0 +1,94 @@
+# 校园Java-OJ系统配置文件
+
+# 服务器配置
+server:
+  port: ":8080"
+  mode: "debug"  # debug, release
+  read_timeout: "60s"
+  write_timeout: "60s"
+
+# MongoDB配置
+mongodb:
+  uri: "mongodb://admin:campus123@localhost:27017"
+  database: "campus_oj"
+  connect_timeout: "10s"
+  max_pool_size: 50
+  min_pool_size: 5
+
+# Redis配置
+redis:
+  host: "localhost"
+  port: 6379
+  password: "campus123"
+  db: 0
+  pool_size: 20
+
+# RabbitMQ配置
+rabbitmq:
+  host: "localhost"
+  port: 5672
+  username: "admin"
+  password: "campus123"
+  vhost: "/"
+
+# 判题配置
+judge:
+  # go-judge沙箱集群配置
+  sandboxes:
+    - url: "http://localhost:5050"
+      weight: 1
+      max_concurrent: 10
+      timeout: "30s"
+      health_check_interval: "10s"
+    - url: "http://localhost:5053"
+      weight: 1
+      max_concurrent: 10
+      timeout: "30s"
+      health_check_interval: "10s"
+  
+  # Java编译配置
+  compile:
+    java:
+      command: ["/usr/bin/javac"]
+      env:
+        - "PATH=/usr/bin:/bin"
+        - "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64"
+      cpu_limit: 10000000000    # 10秒(纳秒)
+      memory_limit: 268435456   # 256MB(字节)
+      proc_limit: 50
+      file_timeout: 60          # 文件缓存超时(秒)
+  
+  # Java运行配置
+  runtime:
+    java:
+      command: ["/usr/bin/java"]
+      env:
+        - "PATH=/usr/bin:/bin"
+        - "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64"
+      cpu_limit: 5000000000     # 5秒(纳秒)
+      memory_limit: 134217728   # 128MB(字节)
+      proc_limit: 1
+      output_limit: 10240       # 10KB
+  
+  # 文件管理
+  file_management:
+    cleanup_interval: "5m"     # 清理间隔
+    max_cache_size: "1GB"      # 最大缓存大小
+    auto_cleanup: true         # 自动清理过期文件
+
+# JWT配置
+jwt:
+  secret: "your-secret-key-change-in-production"
+  expire: "24h"
+
+# 日志配置
+logging:
+  level: "info"              # debug, info, warn, error
+  format: "json"             # json, text
+  output: "both"             # stdout, file, both
+  file:
+    enabled: true
+    path: "logs/app.log"
+    max_size: 100             # MB
+    max_backups: 10
+    max_age: 30               # 天
