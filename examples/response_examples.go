@@ -26,10 +26,10 @@ func (h *ExampleHandler) SuccessExample(c *gin.Context) {
 			"email":    "zhangsan@example.com",
 		},
 	}
-	
+
 	// 使用新版本的 SendSuccess
 	utils.SendSuccess(c, data)
-	
+
 	/* 响应格式：
 	{
 		"code": 0,
@@ -51,7 +51,7 @@ func (h *ExampleHandler) SuccessExample(c *gin.Context) {
 func (h *ExampleHandler) ErrorExample(c *gin.Context) {
 	// 方式1：直接使用错误码
 	utils.SendError(c, errors.USER_NOT_FOUND)
-	
+
 	/* 响应格式：
 	{
 		"code": 20001,
@@ -65,7 +65,7 @@ func (h *ExampleHandler) ErrorExample(c *gin.Context) {
 func (h *ExampleHandler) ErrorWithDetailExample(c *gin.Context) {
 	// 方式2：带详情的错误响应
 	utils.SendErrorWithDetail(c, errors.INVALID_PARAMS, "用户ID格式不正确")
-	
+
 	/* 响应格式：
 	{
 		"code": 10002,
@@ -83,7 +83,7 @@ func (h *ExampleHandler) BusinessErrorExample(c *gin.Context) {
 	// 方式3：使用业务错误对象
 	err := errors.NewDuplicateSubmission("相同代码在10分钟内已提交")
 	utils.SendBusinessError(c, err)
-	
+
 	/* 响应格式：
 	{
 		"code": 40007,
@@ -100,10 +100,10 @@ func (h *ExampleHandler) BusinessErrorExample(c *gin.Context) {
 func (h *ExampleHandler) HandleErrorExample(c *gin.Context) {
 	// 模拟一个业务错误
 	err := errors.NewUserNotFound("用户ID: 507f1f77bcf86cd799439011")
-	
+
 	// 使用统一错误处理函数
 	utils.HandleError(c, err)
-	
+
 	/* 响应格式：
 	{
 		"code": 20001,
@@ -130,10 +130,10 @@ func (h *ExampleHandler) PaginationExample(c *gin.Context) {
 			"email":    "lisi@example.com",
 		},
 	}
-	
+
 	// 使用分页响应
 	utils.SendSuccessWithPagination(c, users, 1, 20, 100)
-	
+
 	/* 响应格式：
 	{
 		"code": 0,
@@ -169,9 +169,9 @@ func (h *ExampleHandler) ValidationErrorExample(c *gin.Context) {
 		"email":    "邮箱格式不正确",
 		"password": "密码长度至少6位",
 	}
-	
+
 	utils.ValidationErrorResponse(c, validationErrors)
-	
+
 	/* 响应格式：
 	{
 		"code": 10002,
@@ -190,19 +190,19 @@ func (h *ExampleHandler) ValidationErrorExample(c *gin.Context) {
 // ServiceLayerExample 服务层使用示例
 func (h *ExampleHandler) ServiceLayerExample() {
 	// 在服务层中创建业务错误的示例
-	
+
 	// 1. 简单错误
 	_ = errors.NewUserNotFound()
-	
+
 	// 2. 带详情的错误
 	_ = errors.NewInvalidPassword("密码长度不足6位")
-	
+
 	// 3. 自定义错误
 	_ = errors.New(errors.JUDGE_TIMEOUT, "判题服务响应超时，请稍后重试")
-	
+
 	// 4. 格式化错误
 	_ = errors.Newf(errors.CODE_TOO_LONG, "代码长度%d超过限制%d", 10000, 5000)
-	
+
 	// 5. 包装已有错误
 	// originalErr := someOperation()
 	// err := errors.Wrap(errors.DATABASE_ERROR, originalErr)
@@ -220,7 +220,7 @@ function handleApiResponse(response) {
         // 错误处理
         const errorMessage = response.message;
         const errorDetail = response.data?.detail;
-        
+
         // 根据错误码进行不同处理
         switch (response.code) {
             case 10003: // UNAUTHORIZED
@@ -240,7 +240,7 @@ function handleApiResponse(response) {
                 // 显示通用错误提示
                 showError(errorMessage + (errorDetail ? ': ' + errorDetail : ''));
         }
-        
+
         throw new Error(errorMessage);
     }
 }

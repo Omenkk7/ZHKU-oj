@@ -15,7 +15,6 @@ import (
 	"zhku-oj/internal/handler/problem"
 	"zhku-oj/internal/handler/submission"
 	"zhku-oj/internal/handler/user"
-	"zhku-oj/internal/middleware"
 	"zhku-oj/internal/pkg/database"
 	"zhku-oj/internal/pkg/logger"
 	"zhku-oj/internal/repository/mongodb"
@@ -68,85 +67,18 @@ func main() {
 	// 设置Gin模式
 	gin.SetMode(cfg.Server.Mode)
 
-	// 创建路由
+	// 创建路由器
 	router := gin.New()
 
-	// 添加中间件
-	router.Use(middleware.Logger())
-	router.Use(middleware.Recovery())
-	router.Use(middleware.CORS())
-
-	// 健康检查接口
-	router.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"status":    "healthy",
-			"timestamp": time.Now().Unix(),
-			"version":   "v1.0.0",
-		})
-	})
-
-	// API路由组
-	v1 := router.Group("/api/v1")
-	{
-		// 认证相关路由
-		authGroup := v1.Group("/auth")
-		{
-			authGroup.POST("/register", authHandler.Register)
-			authGroup.POST("/login", authHandler.Login)
-			authGroup.POST("/logout", middleware.AuthRequired(), authHandler.Logout)
-		}
-
-		// 用户相关路由
-		userGroup := v1.Group("/users")
-		userGroup.Use(middleware.AuthRequired())
-		{
-			// 当前用户相关接口
-			userGroup.GET("/profile", userHandler.GetProfile)
-			userGroup.PUT("/profile", userHandler.UpdateProfile)
-			userGroup.PUT("/password", userHandler.ChangePassword)
-
-			// 用户信息查询接口
-			userGroup.GET("/:id", userHandler.GetUser)
-			userGroup.GET("/:id/stats", userHandler.GetUserStats)
-		}
-
-		// 题目相关路由
-		problemGroup := v1.Group("/problems")
-		problemGroup.Use(middleware.AuthRequired())
-		{
-			problemGroup.GET("", problemHandler.ListProblems)
-			problemGroup.GET("/:id", problemHandler.GetProblem)
-			problemGroup.POST("", middleware.RoleRequired("teacher", "admin"), problemHandler.CreateProblem)
-			problemGroup.PUT("/:id", middleware.RoleRequired("teacher", "admin"), problemHandler.UpdateProblem)
-			problemGroup.DELETE("/:id", middleware.RoleRequired("admin"), problemHandler.DeleteProblem)
-		}
-
-		// 提交相关路由
-		submissionGroup := v1.Group("/submissions")
-		submissionGroup.Use(middleware.AuthRequired())
-		{
-			submissionGroup.POST("", submissionHandler.Submit)
-			submissionGroup.GET("/:id", submissionHandler.GetSubmission)
-			submissionGroup.GET("", submissionHandler.ListSubmissions)
-		}
-
-		// 管理员路由
-		adminGroup := v1.Group("/admin")
-		adminGroup.Use(middleware.AuthRequired(), middleware.RoleRequired("admin"))
-		{
-			// 系统管理
-			adminGroup.GET("/dashboard", adminHandler.Dashboard)
-			adminGroup.GET("/system/status", adminHandler.SystemStatus)
-
-			// 用户管理 CRUD 接口
-			adminGroup.POST("/users", userHandler.CreateUser)                   // 创建用户
-			adminGroup.GET("/users", userHandler.ListUsers)                     // 获取用户列表
-			adminGroup.PUT("/users/:id", userHandler.UpdateUser)                // 更新用户
-			adminGroup.DELETE("/users/:id", userHandler.DeleteUser)             // 删除用户
-			adminGroup.PUT("/users/:id/activate", userHandler.ActivateUser)     // 激活用户
-			adminGroup.PUT("/users/:id/deactivate", userHandler.DeactivateUser) // 停用用户
-		}
-	}
+	// 创建路由管理器并设置所有路由
+	routerManager := router.NewRouterManager(
+		authHandler,
+		userHandler,
+		problemHandler,
+		submissionHandler,
+		adminHandler,
+	)
+	routerManager.SetupRoutes(router)
 
 	// 创建HTTP服务器
 	server := &http.Server{
