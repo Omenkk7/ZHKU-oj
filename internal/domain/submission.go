@@ -1,3 +1,11 @@
+package domain
+
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
 // Submission 提交记录模型 - 存储用户代码提交和判题结果的完整信息
 // 对应MongoDB集合: submissions
 type Submission struct {
