@@ -1,28 +1,52 @@
 package domain
 
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
 /*
 @Author: omenkk7
 @Date: 2025/9/14 10:44
-@Description: 用户持久层数据
+@Description: 用户持久层数据 x
 */
 
 type User struct {
-	UID           string `gorm:"column:UID"`           // 用户唯一 ID（主键，可以是学号/系统生成的 UUID）
-	Uname         string `gorm:"column:UserName"`      // 用户名（登录名或展示用昵称）
-	PassWord      string `gorm:"column:Pass"`          // 登录密码（加密存储，不能明文）
-	School        string `gorm:"column:School"`        // 学校名称（所属学校）
-	Classes       string `gorm:"column:Classes"`       // 班级（所属班级，比如“计科2001”）
-	Major         string `gorm:"column:Major"`         // 专业（所属专业，比如“计算机科学与技术”）
-	Adept         string `gorm:"column:Adept"`         // 擅长方向（可选字段，比如“算法”、“数据库”）
-	Vjid          string `gorm:"column:Vjid"`          // Virtual Judge 用户名（用于第三方 OJ 账号绑定）
-	Vjpwd         string `gorm:"column:Vjpwd"`         // Virtual Judge 密码（第三方 OJ 账号密码，需加密存储）
-	Email         string `gorm:"column:Email"`         // 邮箱（用户注册/找回密码/通知使用）
-	CodeForceUser string `gorm:"column:CodeForceUser"` // Codeforces 用户名（用于绑定第三方平台）
-	HeadURL       string `gorm:"column:HeadUrl"`       // 头像 URL（用户头像地址）
-	Rating        int    `gorm:"column:Rating"`        // 评分（用户评级，通常用于 OJ 积分/比赛 Elo）
-	LoginIP       string `gorm:"column:LoginIP"`       // 最近登录 IP（记录用户最后一次登录的 IP 地址）
-	RegisterTime  int64  `gorm:"column:RegisterTime"`  // 注册时间（Unix 时间戳，记录用户创建时间）
-	Submited      int64  `gorm:"column:Submited"`      // 提交题目数（总共提交过多少次）
-	Solved        uint32 `gorm:"column:Solved"`        // 已解决题目数（AC 的题目数）
-	Defaulted     string `gorm:"column:Defaulted"`     // 默认状态（可能表示是否启用/封禁用户）
+	ID                primitive.ObjectID `bson:"_id,omitempty" json:"id"`                          // 用户唯一标识ID
+	StudentID         string             `bson:"student_id" json:"student_id"`                     // 学号，用于学校系统集成
+	Username          string             `bson:"username" json:"username"`                         // 用户名，用于登录，全局唯一
+	Password          string             `bson:"password" json:"-"`                                // 加密后，不返回给前端
+	Email             string             `bson:"email" json:"email"`                               // 邮箱地址，用于找回密码等功能
+	RealName          string             `bson:"real_name" json:"real_name"`                       // 真实姓名
+	Role              string             `bson:"role" json:"role"`                                 // 用户角色: student(学生), teacher(教师), admin(管理员)
+	Class             string             `bson:"class" json:"class"`                               // 所属班级
+	Grade             string             `bson:"grade" json:"grade"`                               // 所属年级
+	Avatar            string             `bson:"avatar" json:"avatar"`                             // 头像URL
+	IsActive          bool               `bson:"is_active" json:"is_active"`                       // 账户是否激活
+	Stats             UserStats          `bson:"stats" json:"stats"`                               // 用户统计信息
+	Preferences       UserPreferences    `bson:"preferences" json:"preferences"`                   // 用户偏好设置
+	CreatedAt         time.Time          `bson:"created_at" json:"created_at"`                     // 账户创建时间
+	UpdatedAt         time.Time          `bson:"updated_at" json:"updated_at"`                     // 账户最后更新时间
+	LastLogin         *time.Time         `bson:"last_login,omitempty" json:"last_login,omitempty"` // 最后登录时间
+	PasswordUpdatedAt *time.Time         `bson:"password_updated_at,omitempty" json:"-"`           // 密码最后修改时间
+	LoginCount        int                `bson:"login_count" json:"login_count"`                   // 登录次数统计
+}
+
+// UserStats 用户统计信息 - 记录用户在系统中的各项表现数据
+// 由后台定时任务或异步队列更新，提升查询性能
+type UserStats struct {
+	TotalSubmissions int `bson:"total_submissions" json:"total_submissions"` // 总提交次数
+	AcceptedCount    int `bson:"accepted_count" json:"accepted_count"`       // AC（通过）次数
+	ProblemsSolved   int `bson:"problems_solved" json:"problems_solved"`     // 解决的题目数量（去重）
+	TotalScore       int `bson:"total_score" json:"total_score"`             // 总得分
+	MaxStreak        int `bson:"max_streak" json:"max_streak"`               // 最大连续AC天数
+	CurrentStreak    int `bson:"current_streak" json:"current_streak"`       // 当前连续AC天数
+}
+
+// UserPreferences 用户偏好设置 - 存储用户的个性化配置
+type UserPreferences struct {
+	Language      string `bson:"language" json:"language"`           // 默认编程语言偏好
+	Theme         string `bson:"theme" json:"theme"`                 // 界面主题: light(浅色)/dark(深色)
+	Notifications bool   `bson:"notifications" json:"notifications"` // 是否开启系统通知
 }
