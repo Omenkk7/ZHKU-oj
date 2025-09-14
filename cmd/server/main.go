@@ -8,6 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	database2 "zhku-oj/pkg/database"
+	"zhku-oj/pkg/logger"
 
 	"zhku-oj/internal/config"
 	"zhku-oj/internal/handler/admin"
@@ -15,8 +17,6 @@ import (
 	"zhku-oj/internal/handler/problem"
 	"zhku-oj/internal/handler/submission"
 	"zhku-oj/internal/handler/user"
-	"zhku-oj/internal/pkg/database"
-	"zhku-oj/internal/pkg/logger"
 	"zhku-oj/internal/repository/mongodb"
 	"zhku-oj/internal/service/impl"
 
@@ -34,13 +34,13 @@ func main() {
 	logger.Init(cfg.Logging)
 
 	// 初始化数据库连接
-	mongoClient, err := database.NewMongoDB(cfg.MongoDB)
+	mongoClient, err := database2.NewMongoDB(cfg.MongoDB)
 	if err != nil {
 		log.Fatalf("连接MongoDB失败: %v", err)
 	}
 	defer mongoClient.Disconnect(context.Background())
 
-	redisClient, err := database.NewRedis(cfg.Redis)
+	redisClient, err := database2.NewRedis(cfg.Redis)
 	if err != nil {
 		log.Fatalf("连接Redis失败: %v", err)
 	}

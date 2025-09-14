@@ -3,8 +3,6 @@ package auth
 
 import (
 	"time"
-
-	"github.com/golang-jwt/jwt/v5"
 )
 
 // JWTToken 实现 Token 接口

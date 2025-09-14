@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"math"
 	"zhku-oj/internal/model"
-	"zhku-oj/internal/pkg/errors"
 	repoInterface "zhku-oj/internal/repository/interfaces"
 	serviceInterface "zhku-oj/internal/service/interfaces"
+	errors2 "zhku-oj/pkg/errors"
 
 	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -58,7 +58,7 @@ func (s *userService) CreateUser(ctx context.Context, req *serviceInterface.Crea
 	// 2. 密码加密 (类似Spring Security的PasswordEncoder)
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, errors.Wrap(errors.SYSTEM_ERROR, err)
+		return nil, errors2.Wrap(errors2.SYSTEM_ERROR, err)
 	}
 
 	// 3. 创建用户模型
@@ -82,7 +82,7 @@ func (s *userService) CreateUser(ctx context.Context, req *serviceInterface.Crea
 
 	// 4. 保存到数据库 (类似Spring的@Transactional)
 	if err := s.userRepo.Create(ctx, user); err != nil {
-		return nil, errors.Wrap(errors.DATABASE_ERROR, err)
+		return nil, errors2.Wrap(errors2.DATABASE_ERROR, err)
 	}
 
 	// 5. 清除密码字段 (安全考虑)

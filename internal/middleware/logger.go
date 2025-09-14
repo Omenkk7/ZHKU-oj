@@ -2,8 +2,7 @@ package middleware
 
 import (
 	"time"
-
-	"zhku-oj/internal/pkg/logger"
+	"zhku-oj/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 )

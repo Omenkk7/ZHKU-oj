@@ -1,8 +1,8 @@
 package examples
 
 import (
-	"zhku-oj/internal/pkg/errors"
 	"zhku-oj/internal/pkg/utils"
+	errors2 "zhku-oj/pkg/errors"
 
 	"github.com/gin-gonic/gin"
 )
@@ -50,7 +50,7 @@ func (h *ExampleHandler) SuccessExample(c *gin.Context) {
 // GET /api/v1/examples/error
 func (h *ExampleHandler) ErrorExample(c *gin.Context) {
 	// 方式1：直接使用错误码
-	utils.SendError(c, errors.USER_NOT_FOUND)
+	utils.SendError(c, errors2.USER_NOT_FOUND)
 
 	/* 响应格式：
 	{
@@ -64,7 +64,7 @@ func (h *ExampleHandler) ErrorExample(c *gin.Context) {
 // GET /api/v1/examples/error-detail
 func (h *ExampleHandler) ErrorWithDetailExample(c *gin.Context) {
 	// 方式2：带详情的错误响应
-	utils.SendErrorWithDetail(c, errors.INVALID_PARAMS, "用户ID格式不正确")
+	utils.SendErrorWithDetail(c, errors2.INVALID_PARAMS, "用户ID格式不正确")
 
 	/* 响应格式：
 	{
@@ -81,7 +81,7 @@ func (h *ExampleHandler) ErrorWithDetailExample(c *gin.Context) {
 // GET /api/v1/examples/business-error
 func (h *ExampleHandler) BusinessErrorExample(c *gin.Context) {
 	// 方式3：使用业务错误对象
-	err := errors.NewDuplicateSubmission("相同代码在10分钟内已提交")
+	err := errors2.NewDuplicateSubmission("相同代码在10分钟内已提交")
 	utils.SendBusinessError(c, err)
 
 	/* 响应格式：
@@ -99,7 +99,7 @@ func (h *ExampleHandler) BusinessErrorExample(c *gin.Context) {
 // GET /api/v1/examples/handle-error
 func (h *ExampleHandler) HandleErrorExample(c *gin.Context) {
 	// 模拟一个业务错误
-	err := errors.NewUserNotFound("用户ID: 507f1f77bcf86cd799439011")
+	err := errors2.NewUserNotFound("用户ID: 507f1f77bcf86cd799439011")
 
 	// 使用统一错误处理函数
 	utils.HandleError(c, err)
@@ -192,16 +192,16 @@ func (h *ExampleHandler) ServiceLayerExample() {
 	// 在服务层中创建业务错误的示例
 
 	// 1. 简单错误
-	_ = errors.NewUserNotFound()
+	_ = errors2.NewUserNotFound()
 
 	// 2. 带详情的错误
-	_ = errors.NewInvalidPassword("密码长度不足6位")
+	_ = errors2.NewInvalidPassword("密码长度不足6位")
 
 	// 3. 自定义错误
-	_ = errors.New(errors.JUDGE_TIMEOUT, "判题服务响应超时，请稍后重试")
+	_ = errors2.New(errors2.JUDGE_TIMEOUT, "判题服务响应超时，请稍后重试")
 
 	// 4. 格式化错误
-	_ = errors.Newf(errors.CODE_TOO_LONG, "代码长度%d超过限制%d", 10000, 5000)
+	_ = errors2.Newf(errors2.CODE_TOO_LONG, "代码长度%d超过限制%d", 10000, 5000)
 
 	// 5. 包装已有错误
 	// originalErr := someOperation()
