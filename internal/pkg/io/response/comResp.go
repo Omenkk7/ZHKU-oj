@@ -3,15 +3,13 @@ package response
 import (
 	"net/http"
 
-	"zhku-oj/pkg/io/constanct"
-
 	"github.com/gin-gonic/gin"
 )
 
 /**
  * @Author: omenkk7
  * @Date: 2025/9/13
- * @Desc:响应体基类
+ * @Desc:通用
  */
 
 // Response 统一响应结构
@@ -29,6 +27,7 @@ func NewResponse[T any](code int, msg string, data T) Response[T] {
 		Data:    data,
 	}
 }
+
 
 type RetType string
 

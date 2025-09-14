@@ -6,6 +6,7 @@
 package response
 
 import (
+	"zhku-oj/pkg/io/constanct"
 	"time"
 	"zhku-oj/internal/domain"
 )
@@ -50,7 +51,7 @@ func NewV1LoginResponse(token, refreshToken, uid, username string, expiresIn int
 	return NewResponse(0, "登录成功", AuthLoginData{
 		AccessToken:  token,
 		TokenType:    "Bearer",
-		ExpiresIn:    expiresIn,
+		ExpiresIn:    expiresIn,a
 		Username:     username,
 		UserID:       uid,
 		RefreshToken: refreshToken,
