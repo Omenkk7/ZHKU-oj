@@ -10,7 +10,7 @@ import (
  * @Author: omenkk7
  * @Date: 2025/9/13
  * @Desc:通用
- */
+ */q
 
 // Response 统一响应结构
 type Response[T any] struct {
