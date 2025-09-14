@@ -1,4 +1,4 @@
-package utils
+package constanct
 
 import (
 	"net/http"
@@ -12,8 +12,19 @@ import (
 
 type ResCode int32
 
+// 空类型
+type Empty struct{}
+
 const (
 	SuccessCode ResCode = 0
+)
+
+// 语言
+type Language string
+
+const (
+	java Language = "java"
+	c    Language = "c"
 )
 
 /*公共错误 10*/

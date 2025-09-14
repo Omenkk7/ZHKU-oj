@@ -21,15 +21,6 @@ type Response[T any] struct {
 	Data    T      `json:"data"`
 }
 
-// 通用Response构造函数
-func NewResponse[T any](code int, msg string, data T) Response[T] {
-	return Response[T]{
-		Code:    code,
-		Message: msg,
-		Data:    data,
-	}
-}
-
 type RetType string
 
 const (
@@ -39,25 +30,20 @@ const (
 	NOT_FOUND RetType = "not_found"
 )
 
-func ResponseOK(c *gin.Context, resp interface{}) {
-	c.JSON(http.StatusOK, resp)
-}
-
-func ResponseError(c *gin.Context, code constant.ResCode) {
-	c.JSON(code.HttpCode(), Response{
-		Code:    int(code),
-		Message: code.Msg(),
+// 成功统一用 StatusOK
+func ResponseOK[T any](c *gin.Context, data T) {
+	c.JSON(http.StatusOK, Response[T]{
+		Code:    int(constanct.SuccessCode),
+		Message: constanct.SuccessCode.Msg(),
+		Data:    data,
 	})
 }
 
-/*
-*
-创建响应结构函数
-*/
-func CreateResponse(code constant.ResCode, data interface{}) Response {
-	return Response{
+// 错误返回，data 永远是空
+func ResponseError(c *gin.Context, code constanct.ResCode) {
+	c.JSON(code.HttpCode(), Response[any]{
 		Code:    int(code),
 		Message: code.Msg(),
-		Data:    data,
-	}
+		Data:    nil, // 或 constanct.Empty{}
+	})
 }

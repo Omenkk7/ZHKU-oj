@@ -40,41 +40,55 @@ judge:
       max_concurrent: 10
       timeout: "30s"
       health_check_interval: "10s"
-    - url: "http://localhost:5053"
-      weight: 1
-      max_concurrent: 10
-      timeout: "30s"
-      health_check_interval: "10s"
+      enabled: true
+      retry_times: 3
+      retry_interval: "1s"
   
-  # Java编译配置
+  # Java编译配置（对应go-judge编译阶段）
   compile:
     java:
-      command: ["/usr/bin/javac"]
+      command: ["/usr/bin/javac", "-encoding", "UTF-8", "-cp", "/w", "Main.java"]
       env:
         - "PATH=/usr/bin:/bin"
         - "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64"
+        - "CLASSPATH=."
+        - "LANG=C.UTF-8"
       cpu_limit: 10000000000    # 10秒(纳秒)
       memory_limit: 268435456   # 256MB(字节)
+      stack_limit: 134217728    # 128MB(字节)
       proc_limit: 50
-      file_timeout: 60          # 文件缓存超时(秒)
+      output_limit: 10240       # 10KB
+      source_file: "Main.java"
+      executable: "Main.class"
   
-  # Java运行配置
+  # Java运行配置（对应go-judge运行阶段）
   runtime:
     java:
-      command: ["/usr/bin/java"]
+      command: ["/usr/bin/java", "-cp", "/w", "Main"]
       env:
         - "PATH=/usr/bin:/bin"
         - "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64"
-      cpu_limit: 5000000000     # 5秒(纳秒)
-      memory_limit: 134217728   # 128MB(字节)
+        - "CLASSPATH=."
+        - "LANG=C.UTF-8"
+      cpu_limit: 5000000000     # 5秒(纳秒)，可被题目配置覆盖
+      memory_limit: 134217728   # 128MB(字节)，可被题目配置覆盖
+      stack_limit: 67108864     # 64MB(字节)
       proc_limit: 1
       output_limit: 10240       # 10KB
   
-  # 文件管理
+  # 文件管理配置
   file_management:
     cleanup_interval: "5m"     # 清理间隔
     max_cache_size: "1GB"      # 最大缓存大小
     auto_cleanup: true         # 自动清理过期文件
+    file_timeout: 300          # 文件缓存超时(秒)
+  
+  # 负载均衡配置
+  load_balancer:
+    strategy: "round_robin"    # 负载均衡策略: round_robin, weighted, least_connections
+    health_check_enabled: true
+    failure_threshold: 3       # 失败阈值
+    recovery_threshold: 2      # 恢复阈值
 
 # JWT配置
 jwt:
