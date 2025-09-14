@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// RouterManager 路由管理器
+// RouterManager 路由管理器 持有handler的引用
 type RouterManager struct {
 	// Handler依赖
 	authHandler       *auth.AuthHandler
